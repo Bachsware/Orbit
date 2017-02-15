@@ -1,0 +1,15 @@
+echo "Driver: Making target"
+cmake .
+make -j8
+echo "Driver: Target is installed"
+
+rm universe.dat
+
+echo "Driver: RUnning Target: "
+./Orbit $1
+echo "Driver: Simulation ended"
+
+echo "Driver: Uploading result"
+cp universe.dat ~/Dropbox/\!\!Universitet/rumfart/universe.dat
+
+
