@@ -8,8 +8,3 @@ rm universe.dat
 echo "Driver: RUnning Target: "
 ./Orbit $1
 echo "Driver: Simulation ended"
-
-echo "Driver: Uploading result"
-cp universe.dat ~/Dropbox/\!\!Universitet/rumfart/universe.dat
-
-
