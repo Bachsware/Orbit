@@ -1,9 +1,11 @@
+echo "Driver: Cleaning environment"
+make clean
+rm -f Orbit CMakeCache.txt *.dat
+
 echo "Driver: Making target"
 cmake .
 make -j8
 echo "Driver: Target is installed"
-
-rm universe.dat
 
 echo "Driver: RUnning Target: "
 ./Orbit $1

@@ -18,10 +18,11 @@ using namespace arma;
 
 class Universe {
 public:
-    Universe(std::vector<Planet> planets, std::vector<Satellite> satellites, double dt, std::string fileName = "universe.dat")
+    Universe(std::vector<Planet> planets, std::vector<Satellite> satellites,mat thrustPlan , double dt, std::string fileName = "universe.dat")
             : planets(planets),
               satellites(satellites),
-            dt(dt)
+              dt(dt),
+              thrustPlan(thrustPlan)
     {
         data.open(fileName);
     }
@@ -36,7 +37,7 @@ public:
         for (int n = 0; n < n_timeSteps; ++n) {
 
             double progress = floor(double(n+1)/double(n_timeSteps)*1000.0)/10.0;
-            bool timeToWrite = writingRate<=counter;
+            bool timeToWrite = writingRate<=counter || n==0;
 
             if (timeToWrite) dataPoint = std::to_string(time+dt) + " ";
 
@@ -48,6 +49,7 @@ public:
                 vec r = si.getPosition();
                 vec v = si.getSpeed();
 
+                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
                 applyGravity(r,v,dt);
 
                 // New coordinates
@@ -55,7 +57,6 @@ public:
                 si.setPosition(r);
 
                 satellites.at(j) = si;
-                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
             }
 
             // Update planets
@@ -66,13 +67,13 @@ public:
                 vec r = pi.getPosition();
                 vec v = pi.getSpeed();
 
+                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
                 applyGravity(r,v,dt);
 
-                // New coordinates
-                pi.setSpeed(v);
+                // New coordinates + thrust
+                pi.setSpeed(v+thrustPlan.col(n));
                 pi.setPosition(r);
                 planets.at(j) = pi;
-                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
             }
             time += dt;
             if (timeToWrite){
@@ -110,11 +111,10 @@ private:
         v += acceleration*dt;
         r += v*dt; // dr = v*dt + 1/2*a*dt^2
     }
-
+    mat thrustPlan;
     std::vector<Planet> planets;
     std::vector<Satellite> satellites;
     double dt = 1.0;
 };
-
 
 #endif //ORBIT_UNIVERSE_H
