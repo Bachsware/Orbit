@@ -24,22 +24,24 @@ public:
               dt(dt),
               thrustPlan(thrustPlan)
     {
-        data.open(fileName);
+
     }
-    void evolve(int n_timeSteps){
+    void evolve(){
         double time = 0, counter = 0.0; int dataIndex = 0;
-        double Nd_data = 2000;
+        double n_timeSteps = thrustPlan.n_cols;
+        /*double Nd_data = 2000;
         if (Nd_data>n_timeSteps) Nd_data=n_timeSteps;
         int N_data = int(Nd_data);
         std::string dataContainer[N_data];
         double writingRate = n_timeSteps/N_data;
         std::string dataPoint;
+         */
         for (int n = 0; n < n_timeSteps; ++n) {
 
-            double progress = floor(double(n+1)/double(n_timeSteps)*1000.0)/10.0;
-            bool timeToWrite = writingRate<=counter || n==0;
+           // double progress = floor(double(n+1)/double(n_timeSteps)*1000.0)/10.0;
+           // bool timeToWrite = writingRate<=counter || n==0;
 
-            if (timeToWrite) dataPoint = std::to_string(time+dt) + " ";
+           // if (timeToWrite) dataPoint = std::to_string(time+dt) + " ";
 
             // Update satellites
             for (int j = 0; j < satellites.size(); ++j) {
@@ -49,11 +51,11 @@ public:
                 vec r = si.getPosition();
                 vec v = si.getSpeed();
 
-                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
+             //   if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
                 applyGravity(r,v,dt);
 
                 // New coordinates
-                si.setSpeed(v);
+                si.setSpeed(v+thrustPlan.col(n));
                 si.setPosition(r);
 
                 satellites.at(j) = si;
@@ -67,27 +69,28 @@ public:
                 vec r = pi.getPosition();
                 vec v = pi.getSpeed();
 
-                if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
+               // if (timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
                 applyGravity(r,v,dt);
 
                 // New coordinates + thrust
-                pi.setSpeed(v+thrustPlan.col(n));
+                pi.setSpeed(v);
                 pi.setPosition(r);
                 planets.at(j) = pi;
             }
             time += dt;
-            if (timeToWrite){
-                cout << "Progress: "<< progress << " %, index: " << dataIndex+1 <<  endl;
-                dataContainer[dataIndex]=dataPoint;
-                counter = 1; dataIndex++;
-            } else{
-                counter++;
-            }
+            //if (timeToWrite){
+            //    cout << "Progress: "<< progress << " %, index: " << dataIndex+1 <<  endl;
+            //    dataContainer[dataIndex]=dataPoint;
+            //    counter = 1; dataIndex++;
+            //} else{
+            //    counter++;
+            //}
         }
-        for (int i = 0; i < N_data; ++i) {
-            data << dataContainer[i] << endl;
-        }
-        data.close();
+        //data.open(fileName);
+        //for (int i = 0; i < N_data; ++i) {
+        //    data << dataContainer[i] << endl;
+        //}
+        //data.close();
     }
     std::vector<Satellite> getSatellites(){
         return satellites;

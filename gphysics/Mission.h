@@ -56,7 +56,6 @@ namespace MARSMISSION {
     vec v_moon = {1.056246398805415E+00, -1.876016846394916E-01,  9.874168442103273E-02};
     Planet moon{r_moon*positionScale,v_moon*positionScale,mu_moon};
 
-    mat thrustPlan = mat(3,iterations,fill::zeros);
 }
 
 #endif //ORBIT_MISSION_H

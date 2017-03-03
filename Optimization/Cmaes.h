@@ -11,9 +11,17 @@
 #include <mutex>
 #include "ParallelDriver.h"
 
+
 struct Member{
-    vec design;
+    arma::vec design;
     double cost;
+    bool operator<(const Member& other){
+        return cost < other.cost;
+    }
+
+    bool operator>(const Member& other){
+        return cost > other.cost;
+    }
 };
 
 template<class Function>
@@ -52,43 +60,37 @@ auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval, double targetCost =
     const double damps = 1 + 2 * std::max(0.0, std::sqrt((mueff - 1) / (N + 1)) - 1) + cs; // damping for sigma
     const double chiN = std::sqrt(N)*(1 - 1.0 / (4 * N) + 1.0 / (21 * std::pow(N, 2)));  // expectation of || N(0, I) || == norm(randn(N, 1))
 
-
-    std::vector<Member> oldPopulation;
-    auto funcType = []()->void{};
+    std::vector<Member> population(lambda);
     while(nFunEvals<maxFunEval){
-        std::vector<Member> population;
         auto driver = ParallelDriver{};
         std::mutex m;
         // Creating population
         for (int i = 0; i < lambda; ++i) {
             driver.addTask([&m,i, N,xmean,sigma,B,D,f,&population]()->void{
-
                 // Construct member
-                Member child;
                 arma_rng::set_seed_random();
                 vec randVec = arma::randn(N);
-                randVec /= arma::norm(randVec);
-                child.design = xmean + sigma*B*(D%randVec);
+
+                //randVec /= arma::norm(randVec);
+                randVec = xmean + sigma*B*(D%randVec);
 
                 // Test member and push to population
                 m.lock();
-                child.cost = f(child.design);
-                population.push_back(child);
+                    Member child;
+                    child.design = randVec;
+                    child.cost = f(child.design);
+                    population.at(i)=child;
                 m.unlock();
             });
         }
 
         driver.run();
+
         // Sorting members of population
-        std::sort(population.begin(),population.end(), [](const Member a,const Member b)->bool{
-            return b.cost > a.cost;
-        });
+        std::sort(population.begin(),population.end()); // This one may contain -nan FIX THIS
 
         // Check fitness
-        if(population.front().cost <= targetCost){
-            oldPopulation = population;
-            break;
-        }
+        if(population.front().cost <= targetCost){break;}
 
         // Update mean
         vec xold = xmean;
@@ -130,16 +132,14 @@ auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval, double targetCost =
         if (nFunEvals - eigeneval > lambda / (c1 + cmu) / N / 10) // to achieve O(N ^ 2)
         {
             eigeneval = nFunEvals;
-            auto C2 = (C + C.t()) / 2; // enforce symmetry (Maybe check if this is important ~ Christian Bach)
+            //auto C2 = (C + C.t()) / 2; // enforce symmetry (Maybe check if this is important ~ Christian Bach)
 
-            arma::eig_sym(D, B, C2);// eigen decomposition, B == normalized eigenvectors
+            arma::eig_sym(D, B, C);// eigen decomposition, B == normalized eigenvectors
 
             D = sqrt(D);        // D contains standard deviations now
-
         }
 
-        std:: cout << "cmaes: " << population.front().cost <<  endl;
-        oldPopulation = population;
+        std:: cout << "Cmaes: cost=" << population.front().cost << ",\t sigma="<<sigma<<  endl;
     };
-    return oldPopulation.front();
+    return population.front();
 }
