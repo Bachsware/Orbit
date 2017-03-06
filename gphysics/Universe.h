@@ -18,7 +18,7 @@ using namespace arma;
 
 class Universe {
 public:
-    Universe(std::vector<Planet> planets, std::vector<Satellite> satellites,mat thrustPlan , double dt, std::string fileName = "universe.dat")
+    Universe(std::vector<Planet> planets, std::vector<Satellite> satellites,mat thrustPlan , double dt, std::string fileName = "Data/universe.dat")
             : planets(planets),
               satellites(satellites),
               dt(dt),

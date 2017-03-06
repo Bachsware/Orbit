@@ -4,6 +4,7 @@
 
 #include "gphysics/Universe.h"
 #include "gphysics/Mission.h"
+#include "gphysics/Utilities.h"
 
 #include "Optimization/Cmaes.h"
 using namespace arma;
@@ -34,25 +35,31 @@ int main(int argc, char* argv[]) {
     planets.push_back(MISSION::mars);
     satellites.push_back(MISSION::spacecraft);
 
-
-    // Simulate mission:
-    //Universe universe{planets,satellites,MISSION::timeScale};
-    //universe.evolve(zeros(3,1000));
-
+    // Cost function for Mars mission
     auto distanceToMars = [=](vec x)->double{
         mat plan = reshape(x,3,x.n_rows/3);
-        Universe universe(planets,satellites,plan,3.0);
+        vec tt  = linspace(0,1,33000);
+        plan = interpDesign<3>(plan,tt);
+        double dt = 315.0;
+        Universe universe(planets,satellites,plan,dt);
         universe.evolve();
-        double distance = norm(universe.getPlanets().at(3).getPosition()-universe.getSatellites().at(0).getPosition());
-        return distance;
+        double distance = sqrt(norm(universe.getPlanets().at(3).getPosition()-universe.getSatellites().at(0).getPosition()));
+        double r_mars = 3390000;
+        return std::abs(distance - r_mars);
     };
 
-    double distance = distanceToMars(vec{300000,fill::zeros});
-    cout << "Distance to Mars: " << distance << endl;
+    // initialguess
+      vec initialguess = MISSION::initialDesign;
+      initialguess = vec{128,fill::zeros};
 
-    Member solution = Cmaes(distanceToMars,vec{30,fill::zeros},1e4,1e6);
+    // trial
+      double distance = distanceToMars(initialguess);
+      cout << "Distance to Mars: " << distance << endl << endl;
 
-    cout << "Optimized distance to Mars: " << solution.cost << endl;
+    // Optimization of thrust plan
+      Member solution = Cmaes(distanceToMars,initialguess,1e4,1e-3,30.0);
+      cout << "Optimized distance to Mars: " << solution.cost << endl;
+      cout << "Optimized design: " << endl << solution.design << endl;
 
     return 0;
 }

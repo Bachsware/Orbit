@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(Orbit)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Ofast -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -std=c++11 -Ofast -march=native")
+
+
 
 find_package(Armadillo REQUIRED)
 
@@ -9,10 +11,12 @@ set(SOURCE_FILES_gphysics
         gphysics/Satellite.h
         gphysics/Planet.h
         gphysics/Universe.h
-        gphysics/Mission.h)
+        gphysics/Mission.h
+        gphysics/Utilities.h)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 add_library(gphysics ${SOURCE_FILES_gphysics})
 set_target_properties(gphysics PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(gphysics -larmadillo)
 
 set(SOURCE_FILES_Optimization
         Optimization/Cmaes.h
@@ -28,4 +32,3 @@ target_link_libraries(Orbit gphysics Optimization)
 
 add_executable(OptimizationTesting Testing/OptimizationTesting.cpp)
 target_link_libraries(OptimizationTesting Optimization)
-
