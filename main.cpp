@@ -47,6 +47,20 @@ int main(int argc, char* argv[]) {
         double r_mars = 3390000;
         return std::abs(distance - r_mars);
     };
+    // Cost function for Mars mission with landing survivable
+    auto distanceToMarsWithLanding = [=](vec x)->double{
+        mat plan = reshape(x,3,x.n_rows/3);
+        vec tt  = linspace(0,1,33000);
+        plan = interpDesign<3>(plan,tt);
+        double dt = 315.0;
+        Universe universe(planets,satellites,plan,dt);
+        universe.evolve();
+        double distance = sqrt(norm(universe.getPlanets().at(3).getPosition()-universe.getSatellites().at(0).getPosition()));
+        double relativeVelocity = sqrt(norm(universe.getPlanets().at(3).getSpeed()-universe.getSatellites().at(0).getSpeed()));
+
+        double r_mars = 3390000;
+        return std::abs(distance - r_mars)+relativeVelocity;
+    };
 
     // initialguess
       vec initialguess = MISSION::initialDesign;
@@ -61,7 +75,7 @@ int main(int argc, char* argv[]) {
       double  tolerance        = 1e-3; // [km]
       double  initialStepSize  = 30.0;
 
-      Member solution = Cmaes(distanceToMars,initialguess,N_iterations,tolerance,initialStepSize);
+      Member solution = Cmaes(distanceToMarsWithLanding,initialguess,N_iterations,tolerance,initialStepSize);
 
       cout << "Optimized distance to Mars: " << solution.cost << endl;
       cout << "Optimized design: " << endl << solution.design << endl;
