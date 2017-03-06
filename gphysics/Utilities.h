@@ -16,8 +16,6 @@ mat interpDesign(const mat & reducedDesign, vec& tt){
     vec t   = linspace(0,1,reducedDesign.n_cols);
     for (int i = 0; i < paramSize; ++i) {
         vec tempVec{N_interpPoints,fill::zeros};
-        //        cout  << "rdc/tr: " << reducedDesign.n_cols << "/" << t.n_rows << endl;
-        //        cout  << "tvr/ttc: " << tempVec.n_rows << "/" << tt.n_rows << endl;
         interp1(t,reducedDesign.row(i).t(),tt,tempVec,"*nearest");
 
         design.row(i)= tempVec.t();
