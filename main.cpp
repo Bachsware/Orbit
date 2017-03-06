@@ -57,7 +57,12 @@ int main(int argc, char* argv[]) {
       cout << "Distance to Mars: " << distance << endl << endl;
 
     // Optimization of thrust plan
-      Member solution = Cmaes(distanceToMars,initialguess,1e4,1e-3,30.0);
+      int     N_iterations     = 1e4;
+      double  tolerance        = 1e-3; // [km]
+      double  initialStepSize  = 30.0;
+
+      Member solution = Cmaes(distanceToMars,initialguess,N_iterations,tolerance,initialStepSize);
+
       cout << "Optimized distance to Mars: " << solution.cost << endl;
       cout << "Optimized design: " << endl << solution.design << endl;
 
