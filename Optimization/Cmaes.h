@@ -25,9 +25,8 @@ struct Member{
 };
 
 template<class Function>
-auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval = 1e4, double targetCost = 1e-3, double initialStepSize = 0.3)->Member{
+auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, double targetCost = 1e-3, double initialStepSize = 0.3)->Member{
     using namespace arma;
-
     unsigned int nFunEvals = 0;
 
 
@@ -62,22 +61,26 @@ auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval = 1e4, double target
     const double chiN = std::sqrt(N)*(1 - 1.0 / (4 * N) + 1.0 / (21 * std::pow(N, 2)));     // expectation of || N(0, I) || == norm(randn(N, 1))
 
     std::vector<Member> population(lambda);
+    Member bestMember;
+    bestMember.cost = 1e90;
+
     while(nFunEvals<maxFunEval){
         auto driver = ParallelDriver{};
         std::mutex m;
 
+
         // Creating population
-        for (int i = 0; i < lambda; ++i) {
+        for (unsigned  int i = 0; i < lambda; ++i) {
             driver.addTask([&m,i, N,xmean,sigma,B,D,fin,&nFunEvals,&population]()->void{
               // Create child for the new population
               int nFunEvalsThread = 0;
               Member child;
               auto f = [fin,&nFunEvalsThread](const vec& x)->double {++nFunEvalsThread; return fin(x); };
 
-              if(i!=0){ // Sample from distribution
+              if(nFunEvals!=0){ // Sample from distribution
                 arma_rng::set_seed_random();
                 vec randVec = arma::randn(N);
-                //randVec/=norm(randVec);
+                randVec/=norm(randVec);
                 randVec = xmean + sigma*B*(D%randVec);
 
                 child.design = randVec;
@@ -108,6 +111,9 @@ auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval = 1e4, double target
 
         // Check fitness
         if(population.front().cost <= targetCost){break;}
+        if(population.front().cost < bestMember.cost){
+          bestMember = population.front();
+        }
 
         // Update mean
         vec xold = xmean;
@@ -156,5 +162,5 @@ auto Cmaes(const Function& fin,arma::vec x0, int maxFunEval = 1e4, double target
         }
 
     };
-    return population.front();
+    return bestMember;
 }

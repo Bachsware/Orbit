@@ -7,25 +7,13 @@
 #include "gphysics/Utilities.h"
 
 #include "Optimization/Cmaes.h"
+
 using namespace arma;
 
 std::vector<Planet> planets;
 std::vector<Satellite> satellites;
 
 int main(int argc, char* argv[]) {
-    // I/O handling
-    int iterations = 0;
-    if (argc >= 2) {
-
-        std::istringstream iss{argv[1]};
-        int n;
-        if (iss >> n) {
-            iterations = n;
-        }
-    } else {
-        iterations = 5;
-    }
-
     // Choose mission:
     namespace MISSION = MARSMISSION;
 
@@ -33,52 +21,64 @@ int main(int argc, char* argv[]) {
     planets.push_back(MISSION::earth);
     planets.push_back(MISSION::moon);
     planets.push_back(MISSION::mars);
+
     satellites.push_back(MISSION::spacecraft);
 
-    // Cost function for Mars mission
-    auto distanceToMars = [=](vec x)->double{
-        mat plan = reshape(x,3,x.n_rows/3);
-        vec tt  = linspace(0,1,33000);
-        plan = interpDesign<3>(plan,tt);
-        double dt = 315.0;
-        Universe universe(planets,satellites,plan,dt);
-        universe.evolve();
-        double distance = sqrt(norm(universe.getPlanets().at(3).getPosition()-universe.getSatellites().at(0).getPosition()));
-        double r_mars = 3390000;
-        return std::abs(distance - r_mars);
-    };
+    double dt = 315.0; // [s]
+
+
     // Cost function for Mars mission with landing survivable
     auto distanceToMarsWithLanding = [=](vec x)->double{
-        mat plan = reshape(x,3,x.n_rows/3);
+        //x/=max(x)*50*dt;
+        // Convert design vector into matrix format ~ interpolate over ~ 4 months
         vec tt  = linspace(0,1,33000);
-        plan = interpDesign<3>(plan,tt);
-        double dt = 315.0;
-        Universe universe(planets,satellites,plan,dt);
+        mat plan = interpDesign<3>(x,tt);
+
+        // Create universe
+        Universe<false> universe(planets,satellites,plan,dt);
+
+        // evolve universe
         universe.evolve();
+
+        // Fetch end result ~ relative position and velocity
         double distance = sqrt(norm(universe.getPlanets().at(3).getPosition()-universe.getSatellites().at(0).getPosition()));
         double relativeVelocity = sqrt(norm(universe.getPlanets().at(3).getSpeed()-universe.getSatellites().at(0).getSpeed()));
+        double fuelUsage = sum(x);
+        // return distance to Martian surface + relative velocity as the cost to be minimzed
+        double r_mars = 3390; // [km]
 
-        double r_mars = 3390000;
-        return std::abs(distance - r_mars)+relativeVelocity;
+        return (std::abs(distance - r_mars)+relativeVelocity);
     };
 
     // initialguess
-      vec initialguess = MISSION::initialDesign;
-      initialguess = vec{128,fill::zeros};
-
+      vec initialguess = vec{128,fill::zeros};
+      //initialguess = MISSION::initialguess;
     // trial
-      double distance = distanceToMars(initialguess);
-      cout << "Distance to Mars: " << distance << endl << endl;
+      double distance = distanceToMarsWithLanding(initialguess);
+      cout << "Cost of design: \t" << distance << endl << endl;
 
     // Optimization of thrust plan
-      int     N_iterations     = 1e4;
-      double  tolerance        = 1e-3; // [km]
-      double  initialStepSize  = 30.0;
 
+      // Optimization parameters
+      int     N_iterations     = 1e4;
+      double  tolerance        = 1e-3; // [m]
+      double  initialStepSize  = 30.0; // [m/s/dt]
+
+      // The actual optimization
       Member solution = Cmaes(distanceToMarsWithLanding,initialguess,N_iterations,tolerance,initialStepSize);
 
-      cout << "Optimized distance to Mars: " << solution.cost << endl;
-      cout << "Optimized design: " << endl << solution.design << endl;
+      // Result from optimization
+      cout << "Optimized cost: \t" << solution.cost << endl;
+      cout << "Optimized design: \t" << endl << solution.design.t() << endl;
+
+      //set initialparams
+      vec tt  = linspace(0,1,33000);
+      mat plan = interpDesign<3>(solution.design,tt);
+
+      // Creating new universe ~ and getfile
+      Universe<true> universe(planets,satellites,plan,dt,"Data/OptimizedSpacecraft4.dat");
+      // evolve universe
+      universe.evolve();
 
     return 0;
 }
