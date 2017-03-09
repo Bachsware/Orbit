@@ -7,8 +7,6 @@
 
 #include <armadillo>
 #include <iostream>
-
-#include <iostream>
 #include <fstream>
 
 #include "Planet.h"
@@ -55,6 +53,7 @@ public:
 
                 // Old coordinates
                 vec r = si.getPosition();
+                si.dontIkaroz(planets.at(0).getPosition(),planets.at(1).getPosition());
                 vec v = si.getSpeed();
 
                 if (collect && timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";

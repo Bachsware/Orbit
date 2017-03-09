@@ -17,6 +17,17 @@ public:
 
     vec getPosition(){return position;}
     vec getSpeed(){return  speed;}
+
+    bool hasBeenCloser = false;
+    void dontIkaroz(vec rSun, vec rEarth){
+        double myDistance = sqrt(norm(position-rSun));
+        double earthDistance = sqrt(norm(position-rEarth));
+        if(hasBeenCloser==false){
+          if(myDistance<earthDistance*0.75){
+            hasBeenCloser = true;
+          }
+        }
+    }
     void setSpeed(vec boost){
         speed = boost;
     }

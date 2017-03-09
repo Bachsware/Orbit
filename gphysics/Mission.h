@@ -39,8 +39,9 @@ namespace MARSMISSION {
 
     // Create satellites and planets
     vec r_sat = unitDirectionEarth2Mars*9000;
-    vec v_sat = unitDirectionEarth2Mars*100.0;
-    Satellite spacecraft{r_sat*positionScale,v_sat*positionScale,1.0,"Bach"};
+    //vec v_moon = {1.056246398805415E+00, -1.876016846394916E-01,  9.874168442103273E-02};
+    vec v_sat = unitDirectionEarth2Mars*18; // km/s // 14 marsMissionAt
+    Satellite spacecraft{r_sat*positionScale,v_sat*positionScale,12.0,"Bach"};
 
 
     /* SUN at mission launch

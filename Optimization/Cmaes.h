@@ -41,7 +41,7 @@ auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, doub
     mat invsqrtC = zeros(N,N);                      // = (sqrt(C)).inv()
     vec xmean = x0;                                 // Input guess
 
-    const unsigned lambda = 16; //30;                     // No. of Offsprings
+    const unsigned lambda = 24;                     // No. of Offsprings
     const unsigned mu = lambda / 2;                 // No. of selected offsprings for Covariance update
     double eigeneval = 0;                           // No. of eigendecompositions
 
@@ -103,7 +103,7 @@ auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, doub
             });
         }
 
-        cout << "CMAES: leaderCost = "<< population.front().cost <<"\tsigma = "<<sigma << endl;
+        cout << "["<<int(double(nFunEvals)/double(maxFunEval)*100) << "%]\tCMAES: leaderCost = "<< population.front().cost <<"\tsigma = "<<sigma << endl;
         driver.run();
 
         // Sorting members of population
