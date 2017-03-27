@@ -41,7 +41,7 @@ auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, doub
     mat invsqrtC = zeros(N,N);                      // = (sqrt(C)).inv()
     vec xmean = x0;                                 // Input guess
 
-    const unsigned lambda = 24;                     // No. of Offsprings
+    const unsigned lambda = 16;                     // No. of Offsprings
     const unsigned mu = lambda / 2;                 // No. of selected offsprings for Covariance update
     double eigeneval = 0;                           // No. of eigendecompositions
 
@@ -68,7 +68,6 @@ auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, doub
         auto driver = ParallelDriver{};
         std::mutex m;
 
-
         // Creating population
         for (unsigned  int i = 0; i < lambda; ++i) {
             driver.addTask([&m,i, N,xmean,sigma,B,D,fin,&nFunEvals,&population]()->void{
@@ -77,7 +76,7 @@ auto Cmaes(const Function& fin,arma::vec x0, unsigned int maxFunEval = 1e4, doub
               Member child;
               auto f = [fin,&nFunEvalsThread](const vec& x)->double {++nFunEvalsThread; return fin(x); };
 
-              if(nFunEvals!=0){ // Sample from distribution
+              if(i!=0){ // Sample from distribution
                 arma_rng::set_seed_random();
                 vec randVec = arma::randn(N);
                 randVec/=norm(randVec);

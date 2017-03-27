@@ -12,7 +12,9 @@ set(SOURCE_FILES_gphysics
         gphysics/Planet.h
         gphysics/Universe.h
         gphysics/Mission.h
-        gphysics/Utilities.h)
+        gphysics/Utilities.h
+        gphysics/IntegrationPolicies/EulerMethodIntegration.h
+        gphysics/IntegrationPolicies/LeapfrogIntegration.h)
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 add_library(gphysics ${SOURCE_FILES_gphysics})
 set_target_properties(gphysics PROPERTIES LINKER_LANGUAGE CXX)

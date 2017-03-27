@@ -1,0 +1,11 @@
+
+\chapter{Introduction}
+
+\section{Motivation}\index{Motivation}
+	In order to make space travel possible and cost-efficient one needs to consider how to control a spacecraft very carefully. First of all missions are constrained by the distance from earth, time of flight and the ratio of fuel and payload. It is however not trivial to determine the most efficient fuel-usage on the thrusters that launches the spacecraft to its destination. This is because the gravitational pull on the spacecrafts in principal origins from everything with mass in the whole universe. This is of course impossible to comprehend in any analysis, but we can restrict ourselves to only consider the bodies acting substantially on the spacecraft. Even doing so, one is still not able to find an analytically precise solution. Therefore we must go for numerical solutions to the set of differential equations that make up the system.
+	\\ \\
+	Our system also have a spacecraft which carries out the mission itself. The spacecraft is the center of the problem as we want to find the best maneuver design in terms of fuel-usage, intercept velocity and of course distance to the target destination.
+	Being able to simulate any N-body gravitational problem with a planets and a spacecraft controlled by a predefined maneuver design, enables that we can find the best maneuver design with optimization algorithms.
+	In this project I have implemented exactly these prerequisites in order to analyze the mission that broad the Curiosity Rover to Mars. Furthermore i have implemented a machine learning algorithm CMA-ES to optimize the default Hohmann transfer maneuver.
+	\\ \\
+	In order to be able to gather sufficient data, I was bound to write the code in CPP and make it execute multithreaded as the simulation and optimization are very consuming processes for any computer.  

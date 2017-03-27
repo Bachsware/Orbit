@@ -1,0 +1,28 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\select@language {english}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}Motivation}{5}{section.1.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}Formalism}{7}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Gravitation}{7}{section.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}Hohmann Transfer Orbit}{7}{section.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}Numerical Solutions to Differential Equations}{7}{section.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.4}Optimal Control Theory}{7}{section.2.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.5}Implementing the CMA-ES Algorithm}{7}{section.2.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}The Mars Mission}{9}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Mission Objectives}{9}{section.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}Launch vehicle}{9}{section.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}The Space Travel}{9}{section.3.3}
+\contentsfinish 

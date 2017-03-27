@@ -18,7 +18,11 @@ public:
     vec getPosition(){return position;}
     vec getSpeed(){return  speed;}
 
+    vec getAcceleration(){return acceleration;}
+    void setAcceleration(vec newAcceleration){acceleration=newAcceleration;}
+
     bool hasBeenCloser = false;
+
     void dontIkaroz(vec rSun, vec rEarth){
         double myDistance = sqrt(norm(position-rSun));
         double earthDistance = sqrt(norm(position-rEarth));
@@ -28,6 +32,7 @@ public:
           }
         }
     }
+
     void setSpeed(vec boost){
         speed = boost;
     }
@@ -39,10 +44,9 @@ public:
         cout << "Name: " << name << ", Velocity: "<< norm(getSpeed())<< endl;
     };
 
+    vec position{3}, speed{3}, acceleration = {0,0,0};
 private:
     std::string name;
-    vec position;
-    vec speed;
     double mu = 1.0;
 };
 

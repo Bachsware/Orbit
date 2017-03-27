@@ -18,22 +18,18 @@ public:
         mu(mu0)
     {
     }
-    vec getPosition(){
-        return position;
-    }
+    vec getPosition(){return position;}
     vec getSpeed(){return  speed;}
-    void setSpeed(vec boost){
-        speed = boost;
-    }
 
-    void setPosition(vec newPosition){
-        position = newPosition;
-    }
+    vec getAcceleration(){return acceleration;}
+    void setAcceleration(vec newAcceleration){acceleration=newAcceleration;}
+
+    void setSpeed(vec boost){speed = boost;}
+    void setPosition(vec newPosition){position = newPosition;}
     double getMu(){ return mu; }
 
 private:
-    vec position{3};
-    vec speed{3};
+    vec position{3}, speed{3}, acceleration = {0,0,0};
     double mu = 1.0;
 };
 

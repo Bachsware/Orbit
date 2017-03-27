@@ -20,47 +20,32 @@ namespace MARSMISSION {
     double mu_mars   = mu_earth*0.107;
     double mu_moon  = 4.902798882*1e12;
 
-    /* EARTH at mission launch
-     *  we use geocentric system
-     */
     vec r_earth = {0.0,0.0,0.0};
     vec v_earth = {0.0,0.0,0.0};
     Planet earth{r_earth*positionScale,v_earth*positionScale,mu_earth};
 
-    /* MARS at mission launch
-      -1.877516144214960E+08  7.879417504795945E+07  7.442923429344438E+06
-       7.195907630755880E+00 -2.312904115480940E+01  2.818634773147277E-01
-     */
     vec r_mars = {-1.877516144214960E+08,  7.879417504795945E+07,  7.442923429344438E+06};
     vec v_mars = {7.195907630755880E+00, -2.312904115480940E+01,  2.818634773147277E-01};
     Planet mars{r_mars*positionScale,v_mars*positionScale,mu_mars};
 
     vec unitDirectionEarth2Mars = (r_mars-r_earth)/norm(r_mars-r_earth);
+    vec temp = {1.0,1.0,1.0};
+    double scale = dot(temp/sqrt(3),unitDirectionEarth2Mars);
+    vec scaledTemp =unitDirectionEarth2Mars*scale;
+    vec toMars = unitDirectionEarth2Mars;
+    vec perpToMars = (temp-scaledTemp)/norm(temp-scaledTemp);
+    double velocity = 1.0, distance = 35786.0; //6.9; // 2.7564
+    Satellite spacecraft{distance*toMars*positionScale,toMars*velocity*positionScale,12.0,"Bach"};
 
-    // Create satellites and planets
-    vec r_sat = unitDirectionEarth2Mars*9000;
-    //vec v_moon = {1.056246398805415E+00, -1.876016846394916E-01,  9.874168442103273E-02};
-    vec v_sat = unitDirectionEarth2Mars*18; // km/s // 14 marsMissionAt
-    Satellite spacecraft{r_sat*positionScale,v_sat*positionScale,12.0,"Bach"};
-
-
-    /* SUN at mission launch
-        -6.511244251882641E+07 -1.325155825916022E+08  4.038490822128952E+03
-        2.723334501912125E+01 -1.302770707957643E+01  1.520335159217900E-03
-    */
     vec r_sun = {-6.511244251882641E+07, -1.325155825916022E+08,  4.038490822128952E+03};
     vec v_sun = {2.723334501912125E+01, -1.302770707957643E+01,  1.520335159217900E-03};
     Planet sun{r_sun*positionScale,v_sun*positionScale,mu_sun};
 
-    /* MOON at mission launch
-      -4.731121882357229E+04 -3.626666887314772E+05  5.003714921506587E+03
-       1.056246398805415E+00 -1.876016846394916E-01  9.874168442103273E-02
-     */
     vec r_moon = {-4.731121882357229E+04, -3.626666887314772E+05, 5.003714921506587E+03};
     vec v_moon = {1.056246398805415E+00, -1.876016846394916E-01,  9.874168442103273E-02};
     Planet moon{r_moon*positionScale,v_moon*positionScale,mu_moon};
-
-    vec initialguess = {10.9946, -7.4011,  1.7334, 20.5505,  -28.1721, 15.1016,  -35.6670, 12.5467,  -21.1936, -2.3672, 20.5192,  -12.5177, 14.9566, -4.2664, -9.1569, -0.4377,  7.7869, -4.2072,  -27.3112,  3.2477,  4.8209,  8.3756,  -27.0894, 32.1988, -3.9880, 22.8088,  1.1552, 18.1372, 20.3780, 10.2015, 40.8930, 12.3933, -8.5744,  -14.9876, 24.1293,  -15.3165,  4.3493,  -22.3250, -3.4572, -3.1159,  -12.7672,  -19.3826,  2.5626,  -26.4971, 18.0801,  5.5062, 25.4991,  -18.7026,  5.3235,  -22.6801, 10.8778, 14.8559, 13.2505,  0.5179, -5.6963, 15.2800,  -32.9032,  7.3275,  2.0987, 12.5616, -12.0345, 15.1054, 26.6374, -1.1702, -22.3162,  6.1960,  1.8924, -31.1689,  2.3163, -3.9518, 29.9093, 27.5124, -1.2489, 15.9630, -3.3711, -0.7915, -11.9653,  8.6967, -10.9650, -7.8950,  5.6670, -13.4464,  4.4527, -4.9500, -17.7380, 12.2230, -13.8026, -27.0792, -2.2791, -9.1435, -25.3779, -8.4746, -6.1967,  -11.4778, -19.2130, -0.4666,  0.6633,  -44.2019,  6.0461, -9.1669,  4.6976,  2.9979, 12.0753, -2.6058, 18.2101,  1.3042, -2.5926, -8.2284,  -19.3104, -12.5146,  3.9508, 15.7593,  -20.9635, 12.5820, 27.4913,  5.7248, -13.8371, 18.3278, -19.9471, -16.9797, -31.6460,   29.2709,  -6.2538,  20.6438,  -7.2332 ,  -3.1162 ,   2.9476 ,  -5.7123};
 }
-
+namespace LaunchToGeostationary {
+  using namespace MARSMISSION;
+}
 #endif //ORBIT_MISSION_H

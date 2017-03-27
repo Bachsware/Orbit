@@ -1,0 +1,12 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Motivation}{chapter.1}% 2
+\BOOKMARK [0][-]{chapter.2}{Formalism}{}% 3
+\BOOKMARK [1][-]{section.2.1}{Gravitation}{chapter.2}% 4
+\BOOKMARK [1][-]{section.2.2}{Hohmann Transfer Orbit}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.3}{Numerical Solutions to Differential Equations}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.4}{Optimal Control Theory}{chapter.2}% 7
+\BOOKMARK [1][-]{section.2.5}{Implementing the CMA-ES Algorithm}{chapter.2}% 8
+\BOOKMARK [0][-]{chapter.3}{The Mars Mission}{}% 9
+\BOOKMARK [1][-]{section.3.1}{Mission Objectives}{chapter.3}% 10
+\BOOKMARK [1][-]{section.3.2}{Launch vehicle}{chapter.3}% 11
+\BOOKMARK [1][-]{section.3.3}{The Space Travel}{chapter.3}% 12

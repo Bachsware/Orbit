@@ -13,13 +13,13 @@
 #include "Satellite.h"
 
 using namespace arma;
-template <bool collect = false>
+template <class Integrator, bool collect = false>
 class Universe {
 public:
     Universe(std::vector<Planet> planets, std::vector<Satellite> satellites,mat thrustPlan , double dt, std::string fileName = "Data/universe.dat")
             : planets(planets),
               satellites(satellites),
-              dt(dt),
+              dt(dt*3.0/4.0),
               thrustPlan(thrustPlan),
               fileName(fileName)
     {
@@ -29,7 +29,8 @@ public:
         double time = 0, counter = 0.0;
 
         int dataIndex = 0;
-        double n_timeSteps = thrustPlan.n_cols;
+        // na=3/4*N, 3/4
+        double n_timeSteps = thrustPlan.n_cols*(4.0/3.0);
         double Nd_data = 2000;
         if (Nd_data>n_timeSteps) Nd_data=n_timeSteps;
         int N_data = int(Nd_data);
@@ -53,15 +54,21 @@ public:
 
                 // Old coordinates
                 vec r = si.getPosition();
-                si.dontIkaroz(planets.at(0).getPosition(),planets.at(1).getPosition());
                 vec v = si.getSpeed();
+                vec a = si.getAcceleration();
 
+                //si.dontIkaroz(planets.at(0).getPosition(),planets.at(1).getPosition());
                 if (collect && timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
-                applyGravity(r,v,dt);
+                Integrator::applyGravity(planets,a,r,v,dt);
 
-                // New coordinates
-                si.setSpeed(v+thrustPlan.col(n));
+                // New coordinates ~ adjust after half time
+                vec immediateThrust = {0,0,0};
+                int N_adjust = floor(n_timeSteps/4.0);
+                if (n>=N_adjust){immediateThrust = thrustPlan.col(n-N_adjust);}
+
+                si.setSpeed(v+immediateThrust);
                 si.setPosition(r);
+                si.setAcceleration(a);
 
                 satellites.at(j) = si;
             }
@@ -73,13 +80,18 @@ public:
                 // Old coordinates
                 vec r = pi.getPosition();
                 vec v = pi.getSpeed();
+                vec a = pi.getAcceleration();
 
+                // Collect data ~ position
                 if (collect && timeToWrite) dataPoint += std::to_string(r(0))+" "+std::to_string(r(1))+" "+std::to_string(r(2))+" ";
-                applyGravity(r,v,dt);
+
+                // Integrate
+                Integrator::applyGravity(planets,a,r,v,dt);
 
                 // New coordinates + thrust
                 pi.setSpeed(v);
                 pi.setPosition(r);
+                pi.setAcceleration(a);
                 planets.at(j) = pi;
             }
             time += dt;
@@ -102,26 +114,13 @@ public:
     std::vector<Satellite> getSatellites(){
         return satellites;
     }
+
     std::vector<Planet> getPlanets(){
         return planets;
     }
+
     std::ofstream data;
 private:
-
-    void applyGravity(vec& r, vec& v,double dt){
-        vec acceleration = {0,0,0};
-        for (int k = 0; k < planets.size(); ++k) {
-            Planet pi = planets.at(k);
-            vec relativePosition = pi.getPosition()-r; // x_i
-            double distance = norm(relativePosition);
-            if (distance>0.0){ // Do not accelerate on self-interaction
-                acceleration += pi.getMu()/pow(distance,2)*normalise(relativePosition);
-            }
-        }
-        v += acceleration*dt;
-        r += v*dt; // dr = v*dt + 1/2*a*dt^2
-    }
-
     std::string fileName;
     mat thrustPlan;
     std::vector<Planet> planets;
